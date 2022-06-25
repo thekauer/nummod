@@ -28,6 +28,7 @@ export const Main = () => {
             src={currentTask?.image}
             alt={`${currentTaskNumber}. feladat`}
             radius="md"
+            height={375}
             withPlaceholder={!currentTask}
           />
         </div>
