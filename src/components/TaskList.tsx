@@ -1,4 +1,4 @@
-import { List, Text } from "@mantine/core";
+import { Group, List, Text } from "@mantine/core";
 import { useEvents } from "../hooks/useEvents";
 
 export const TaskList = () => {
@@ -16,7 +16,14 @@ export const TaskList = () => {
               setCurrentTask(tasks.find((t) => t.number === task.number))
             }
           >
-            {task.number}. feladat
+            <Group>
+              {task.number}. feladat{" "}
+              {task.answer && (
+                <Text color={task.certainty === "FIX" ? "green" : "yellow"}>
+                  {task.answer}
+                </Text>
+              )}
+            </Group>
           </Text>
         </List.Item>
       ))}
