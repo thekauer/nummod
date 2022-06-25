@@ -1,12 +1,13 @@
 import { Button, Group, Image, Stack } from "@mantine/core";
-import { useState } from "react";
-import { Certainty, postAnswer } from "../api/api";
+import { useEffect, useState } from "react";
+import { Certainty, postAnswer, Task } from "../api/api";
 import { useEvents } from "../hooks/useEvents";
 import { Answer, Answers } from "./Answers";
 import { CertaintyContainer } from "./Certainty";
 
 export const Main = () => {
-  const { currentTaskNumber, currentTask } = useEvents();
+  const { currentTaskNumber, currentTask, setCurrentTask, tasks, setTasks } =
+    useEvents();
   const [answer, setAnswer] = useState<Answer>();
   const [certainty, setCertainty] = useState<Certainty>();
 
@@ -17,7 +18,26 @@ export const Main = () => {
     option === certainty ? setCertainty(undefined) : setCertainty(option);
 
   const sendClick = () =>
-    currentTaskNumber && postAnswer(currentTaskNumber, answer, certainty);
+    currentTaskNumber &&
+    postAnswer(currentTaskNumber, answer, certainty).then(() => {
+      setTasks((prev) =>
+        (
+          [
+            ...prev.filter((t) => t.number !== currentTaskNumber),
+            { ...currentTask, answer, certainty },
+          ] as Task[]
+        ).sort((a, b) => a.number - b.number)
+      );
+      const nextTask = tasks.find((t) => t.number === currentTaskNumber + 1);
+      if (nextTask) {
+        setCurrentTask(nextTask);
+      }
+    });
+
+  useEffect(() => {
+    setAnswer(currentTask?.answer as any);
+    setCertainty(currentTask?.certainty);
+  }, [currentTask]);
 
   const canSend = !!currentTaskNumber && (!!answer || !!certainty);
   return (
